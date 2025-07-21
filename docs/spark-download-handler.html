@@ -2,14 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Spark Download Tracker</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <!-- External download handler with defer to ensure proper loading order -->
+  <script src="https://samobeng.github.io/spark-download-handler.js" defer></script>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      font-family: "Inter", sans-serif;
+      background-color: #f3f4f6;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,67 +25,35 @@
     }
     .container {
       background-color: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
       text-align: center;
-      max-width: 700px;
+      max-width: 600px;
       width: 100%;
       border: 1px solid #e5e7eb;
       position: relative;
-      overflow: hidden;
-    }
-    .header {
-      position: relative;
-      margin-bottom: 30px;
-    }
-    .header::after {
-      content: '';
-      position: absolute;
-      bottom: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 4px;
-      background: linear-gradient(90deg, #DB5527, #F97316);
-      border-radius: 2px;
     }
     h1 {
       color: #1f2937;
-      font-size: 2.25rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-    .subtitle {
-      color: #4b5563;
-      font-size: 1.125rem;
-      font-weight: 400;
-      margin-bottom: 30px;
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 20px;
     }
     .download-count {
-      font-size: 4rem;
-      font-weight: 800;
-      color: #DB5527;
-      margin: 30px 0;
+      font-size: 3rem;
+      font-weight: 700;
+      color: #db5527;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      text-shadow: 0 2px 4px rgba(219, 85, 39, 0.15);
-    }
-    .count-label {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #4b5563;
-      margin-top: -20px;
-      margin-bottom: 10px;
     }
     .status-message {
       font-size: 0.875rem;
       color: #6b7280;
       min-height: 20px;
-      margin: 15px 0;
     }
     .loading-spinner {
       border: 4px solid rgba(0, 0, 0, 0.1);
@@ -92,7 +65,11 @@
       display: inline-block;
       vertical-align: middle;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
     .last-updated {
       font-size: 0.75rem;
       color: #9ca3af;
@@ -103,26 +80,25 @@
       font-weight: 600;
     }
     .download-button {
-      background: linear-gradient(to right, #DB5527, #F97316);
+      background-color: #db5527;
       color: white;
-      padding: 14px 32px;
-      border-radius: 10px;
+      padding: 12px 24px;
+      border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.1s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin: 15px 8px;
+      gap: 8px;
+      margin: 10px 5px;
       border: none;
-      box-shadow: 0 4px 12px rgba(219, 85, 39, 0.25);
+      box-shadow: 0 4px 10px rgba(219, 85, 39, 0.3);
       text-decoration: none;
-      font-size: 1.1rem;
     }
     .download-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(219, 85, 39, 0.35);
+      background-color: #c24a22;
+      transform: translateY(-1px);
     }
     .download-button:active {
       transform: translateY(0);
@@ -132,51 +108,39 @@
       outline: none;
       box-shadow: 0 0 0 3px rgba(219, 85, 39, 0.5);
     }
-    .button-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
-    }
     .message-box {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      padding: 30px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      padding: 20px;
       z-index: 1000;
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-      max-width: 400px;
-      width: 90%;
+      gap: 15px;
+      max-width: 350px;
       text-align: center;
     }
     .message-box-content {
       color: #333;
-      font-size: 1.1rem;
-      line-height: 1.6;
-    }
-    .message-box-button {
-      background: linear-gradient(to right, #DB5527, #F97316);
-      color: white;
-      padding: 10px 24px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 600;
       font-size: 1rem;
     }
+    .message-box-button {
+      background-color: #db5527;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
     .message-box-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(219, 85, 39, 0.3);
+      background-color: #c24a22;
     }
     .overlay {
       position: fixed;
@@ -184,7 +148,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(0, 0, 0, 0.5);
       z-index: 999;
       display: none;
     }
@@ -192,150 +156,62 @@
       display: inline-block;
       background-color: #e5e7eb;
       color: #4b5563;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
       margin-left: 8px;
-      font-weight: 600;
-    }
-    .hidden {
-      display: none;
-    }
-    .stats-container {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-top: 25px;
-      flex-wrap: wrap;
-    }
-    .stat-box {
-      background-color: #f9fafb;
-      border-radius: 12px;
-      padding: 15px 20px;
-      min-width: 120px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-    .stat-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #DB5527;
-      margin: 5px 0;
-    }
-    .stat-label {
-      font-size: 0.85rem;
-      color: #6b7280;
-      font-weight: 500;
-    }
-    .logo {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #DB5527, #F97316);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      box-shadow: 0 4px 10px rgba(219, 85, 39, 0.2);
-    }
-    .logo-inner {
-      width: 40px;
-      height: 40px;
-      background-color: white;
-      border-radius: 10px;
-      position: relative;
-      overflow: hidden;
-    }
-    .logo-inner::before {
-      content: '';
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      width: 12px;
-      height: 12px;
-      background-color: #DB5527;
-      border-radius: 3px;
-    }
-    .logo-inner::after {
-      content: '';
-      position: absolute;
-      bottom: 5px;
-      right: 5px;
-      width: 20px;
-      height: 20px;
-      background-color: #DB5527;
-      border-radius: 10px;
-    }
-    .progress-bar {
-      height: 6px;
-      background-color: #e5e7eb;
-      border-radius: 3px;
-      overflow: hidden;
-      margin: 20px auto;
-      max-width: 400px;
-    }
-    .progress {
-      height: 100%;
-      background: linear-gradient(90deg, #DB5527, #F97316);
-      width: 0%;
-      transition: width 0.5s ease;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="logo">
-      <div class="logo-inner"></div>
-    </div>
-    
-    <div class="header">
-      <h1>Spark Download Tracker</h1>
-      <div class="subtitle">Join thousands of developers using our tools</div>
-    </div>
-    
-    <div class="count-label">Total Downloads</div>
+    <h1>Spark Downloads - Test mode</h1>
     <div class="download-count" id="downloadCount">
       <div class="loading-spinner"></div>
     </div>
-    
-    <div class="progress-bar">
-      <div class="progress" id="progressBar"></div>
-    </div>
-    
-    <p class="status-message" id="statusMessage">Initializing download tracker...</p>
-    
-    <div class="button-container">
-      <button id="macDownloadButton" class="download-button" style="display: none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/>
-          <path d="M10 2c1 .5 2 2 2 5"/>
-        </svg>
-        Download for macOS
-      </button>
-
-      <button id="windowsDownloadButton" class="download-button" style="display: none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="4" width="16" height="16" rx="2"/>
-          <path d="M4 12h16"/>
-          <path d="M12 4v16"/>
-        </svg>
-        Download for Windows
-      </button>
-    </div>
-    
-    <p class="text-sm text-gray-600 mt-4" id="platformInfo">Detecting your operating system...</p>
-    
-    <div class="stats-container">
-      <div class="stat-box">
-        <div class="stat-value" id="macDownloads">0</div>
-        <div class="stat-label">macOS Downloads</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-value" id="windowsDownloads">0</div>
-        <div class="stat-label">Windows Downloads</div>
-      </div>
-    </div>
-    
+    <p class="status-message" id="statusMessage">Fetching data...</p>
     <p class="last-updated" id="lastUpdated"></p>
+
+    <!-- Download buttons -->
+    <button id="macDownloadButton" class="download-button" style="display: none;">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        viewBox="0 0 24 24"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      Download for macOS
+    </button>
+
+    <button id="windowsDownloadButton" class="download-button" style="display: none;">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        viewBox="0 0 24 24"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      Download for Windows
+    </button>
+
+    <p class="text-xs text-gray-500 mt-2" id="platformInfo">Detecting your system...</p>
   </div>
 
   <!-- Message Box + Overlay -->
@@ -346,190 +222,162 @@
   </div>
 
   <script>
-    const REPO_OWNER = 'samobeng';
-    const REPO_NAME = 'Spark-binaries';
+    const REPO_OWNER = "samobeng";
+    const REPO_NAME = "Spark-binaries";
     const API_RELEASES_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases`;
-    const UPDATE_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+    const UPDATE_INTERVAL_MS = 5 * 60 * 1000;
 
     const DOWNLOAD_URLS = {
-      'macos-arm64': 'https://github.com/samobeng/Spark-binaries/releases/download/Spark/Spark.dmg.zip',
-      'macos-x64':   'https://github.com/samobeng/Spark-binaries/releases/download/Spark/Spark-x86_64.dmg',
-      'windows':     'https://github.com/samobeng/Spark-binaries/releases/download/Spark/Spark-Windows-Installer.zip'
+      "macos-arm64":
+        "https://github.com/samobeng/Spark-binaries/releases/download/Spark/Spark.dmg.zip",
+      "macos-x64":
+        "https://github.com/samobeng/Spark-binaries/releases/download/Spark/Spark-x86_64.dmg",
+      windows:
+        "https://github.com/samobeng/Spark-binaries/releases/download/Spark/Spark-Windows-Installer.zip",
     };
 
-    // DOM Elements
-    const macBtn = document.getElementById('macDownloadButton');
-    const winBtn = document.getElementById('windowsDownloadButton');
-    const platformInfoElement = document.getElementById('platformInfo');
-    const downloadCountElement = document.getElementById('downloadCount');
-    const statusMessageElement = document.getElementById('statusMessage');
-    const lastUpdatedElement = document.getElementById('lastUpdated');
-    const progressBar = document.getElementById('progressBar');
-    const macDownloadsElement = document.getElementById('macDownloads');
-    const windowsDownloadsElement = document.getElementById('windowsDownloads');
-    const messageBox = document.getElementById('messageBox');
-    const messageBoxContent = document.getElementById('messageBoxContent');
-    const messageBoxClose = document.getElementById('messageBoxClose');
-    const messageOverlay = document.getElementById('messageOverlay');
+    const macBtn = document.getElementById("macDownloadButton");
+    const winBtn = document.getElementById("windowsDownloadButton");
+    const platformInfoElement = document.getElementById("platformInfo");
+    const downloadCountElement = document.getElementById("downloadCount");
+    const statusMessageElement = document.getElementById("statusMessage");
+    const lastUpdatedElement = document.getElementById("lastUpdated");
 
-    // UI Functions
+    const messageBox = document.getElementById("messageBox");
+    const messageBoxContent = document.getElementById("messageBoxContent");
+    const messageBoxClose = document.getElementById("messageBoxClose");
+    const messageOverlay = document.getElementById("messageOverlay");
+
     function showMessage(message, { allowHTML = false } = {}) {
       if (allowHTML) {
         messageBoxContent.innerHTML = message;
       } else {
         messageBoxContent.textContent = message;
       }
-      messageBox.style.display = 'flex';
-      messageOverlay.style.display = 'block';
+      messageBox.style.display = "flex";
+      messageOverlay.style.display = "block";
     }
 
-    function updateProgress(percent) {
-      progressBar.style.width = `${percent}%`;
-    }
-
-    // Event Listeners
-    messageBoxClose.addEventListener('click', () => {
-      messageBox.style.display = 'none';
-      messageOverlay.style.display = 'none';
+    messageBoxClose.addEventListener("click", () => {
+      messageBox.style.display = "none";
+      messageOverlay.style.display = "none";
     });
 
-    // Platform Detection (Fixed)
-    function getDetectedPlatform() {
-      const ua = navigator.userAgent.toLowerCase();
-      const platform = navigator.platform.toLowerCase();
-
-      // Simplified platform detection that works consistently
-      if (ua.includes('win') || platform.includes('win')) {
-        return 'windows';
-      } else if (ua.includes('mac') || platform.includes('mac')) {
-        // Check for Apple Silicon
-        return (ua.includes('arm') || ua.includes('aarch')) ? 'macos-arm64' : 'macos-x64';
+    // Fallback if external script is missing
+    if (typeof triggerDownload !== "function") {
+      function triggerDownload(url) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.download = "";
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
-      
-      return 'unknown';
-    }
-
-    // Download Handling
-    function triggerDownload(url) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
     }
 
     function attachDownloadHandler(button, url) {
       button.onclick = () => triggerDownload(url);
     }
 
-    // UI Update Functions
-    function updateDownloadButtonsAndInfo() {
-      updateProgress(30);
-      statusMessageElement.textContent = 'Detecting your system...';
-      
-      const platform = getDetectedPlatform();
-      macBtn.style.display = 'none';
-      winBtn.style.display = 'none';
+    async function getDetectedPlatform() {
+      const ua = navigator.userAgent.toLowerCase();
+      const platform = navigator.platform.toLowerCase();
 
-      if (platform === 'macos-arm64') {
-        platformInfoElement.innerHTML = 'Detected: <span class="platform-indicator">macOS (Apple Silicon)</span>';
-        macBtn.textContent = 'Download for macOS (Apple Silicon)';
-        macBtn.style.display = 'inline-flex';
-        attachDownloadHandler(macBtn, DOWNLOAD_URLS['macos-arm64']);
-      } else if (platform === 'macos-x64') {
-        platformInfoElement.innerHTML = 'Detected: <span class="platform-indicator">macOS (Intel)</span>';
-        macBtn.textContent = 'Download for macOS (Intel)';
-        macBtn.style.display = 'inline-flex';
-        attachDownloadHandler(macBtn, DOWNLOAD_URLS['macos-x64']);
-      } else if (platform === 'windows') {
-        platformInfoElement.innerHTML = 'Detected: <span class="platform-indicator">Windows</span>';
-        winBtn.textContent = 'Download for Windows';
-        winBtn.style.display = 'inline-flex';
-        attachDownloadHandler(winBtn, DOWNLOAD_URLS['windows']);
-      } else {
-        platformInfoElement.textContent = 'Could not detect your OS. Please choose manually:';
-        macBtn.textContent = 'Download for macOS';
-        winBtn.textContent = 'Download for Windows';
-        macBtn.style.display = 'inline-flex';
-        winBtn.style.display = 'inline-flex';
-        attachDownloadHandler(macBtn, DOWNLOAD_URLS['macos-x64']);
-        attachDownloadHandler(winBtn, DOWNLOAD_URLS['windows']);
-        showMessage('We could not detect your operating system. Please select your download manually.');
+      if (navigator.userAgentData) {
+        try {
+          const uaData = await navigator.userAgentData.getHighEntropyValues([
+            "platform",
+            "architecture",
+          ]);
+          const os = uaData.platform.toLowerCase();
+          const arch = (uaData.architecture || "x64").toLowerCase();
+          if (os === "macos") return arch.includes("arm") ? "macos-arm64" : "macos-x64";
+          if (os.includes("windows")) return "windows";
+        } catch {}
       }
-      
-      updateProgress(50);
+
+      if (ua.includes("windows") || platform.includes("win")) return "windows";
+      if (ua.includes("macintosh") || platform.includes("mac")) {
+        return ua.includes("arm64") || ua.includes("aarch64") ? "macos-arm64" : "macos-x64";
+      }
+
+      return "unknown";
     }
 
-    // Data Fetching (Fixed with timeout handling)
+    async function updateDownloadButtonsAndInfo() {
+      const platform = await getDetectedPlatform();
+      macBtn.style.display = "none";
+      winBtn.style.display = "none";
+
+      if (platform === "macos-arm64") {
+        platformInfoElement.innerHTML =
+          'Detected: <span class="platform-indicator">macOS (Apple Silicon)</span>';
+        macBtn.textContent = "Download for macOS (Apple Silicon)";
+        macBtn.style.display = "inline-flex";
+        attachDownloadHandler(macBtn, DOWNLOAD_URLS["macos-arm64"]);
+      } else if (platform === "macos-x64") {
+        platformInfoElement.innerHTML =
+          'Detected: <span class="platform-indicator">macOS (Intel)</span>';
+        macBtn.textContent = "Download for macOS (Intel)";
+        macBtn.style.display = "inline-flex";
+        attachDownloadHandler(macBtn, DOWNLOAD_URLS["macos-x64"]);
+      } else if (platform === "windows") {
+        platformInfoElement.innerHTML =
+          'Detected: <span class="platform-indicator">Windows</span>';
+        winBtn.textContent = "Download for Windows";
+        winBtn.style.display = "inline-flex";
+        attachDownloadHandler(winBtn, DOWNLOAD_URLS["windows"]);
+      } else {
+        platformInfoElement.textContent =
+          "Could not detect your OS. Please choose manually:";
+        macBtn.textContent = "Download for macOS";
+        winBtn.textContent = "Download for Windows";
+        macBtn.style.display = "inline-flex";
+        winBtn.style.display = "inline-flex";
+        attachDownloadHandler(macBtn, DOWNLOAD_URLS["macos-x64"]);
+        attachDownloadHandler(winBtn, DOWNLOAD_URLS["windows"]);
+        showMessage(
+          "We could not detect your operating system. Please select your download manually."
+        );
+      }
+    }
+
     async function fetchDownloadCounts() {
-      updateProgress(60);
-      statusMessageElement.textContent = 'Fetching download data...';
+      statusMessageElement.textContent = "Fetching latest data...";
       downloadCountElement.innerHTML = '<div class="loading-spinner"></div>';
-      lastUpdatedElement.textContent = '';
+      lastUpdatedElement.textContent = "";
 
       try {
-        // Add timeout to prevent hanging
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-        
-        const res = await fetch(API_RELEASES_URL, { signal: controller.signal });
-        clearTimeout(timeoutId);
-        
+        const res = await fetch(API_RELEASES_URL);
         if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
-        
         const releases = await res.json();
+
+        // Sum download_count for all assets of all releases
         let total = 0;
-        let macCount = 0;
-        let windowsCount = 0;
-        
         for (const release of releases) {
           for (const asset of release.assets || []) {
             total += asset.download_count || 0;
-            
-            // Count downloads per platform
-            if (asset.name.includes('mac') || asset.name.includes('dmg')) {
-              macCount += asset.download_count || 0;
-            } else if (asset.name.includes('Windows') || asset.name.includes('exe') || asset.name.includes('msi')) {
-              windowsCount += asset.download_count || 0;
-            }
           }
         }
-        
         downloadCountElement.textContent = total.toLocaleString();
-        macDownloadsElement.textContent = macCount.toLocaleString();
-        windowsDownloadsElement.textContent = windowsCount.toLocaleString();
-        statusMessageElement.textContent = 'Data updated successfully';
+        statusMessageElement.textContent = "Data updated successfully.";
         lastUpdatedElement.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
       } catch (err) {
-        console.error('Fetch error:', err);
-        downloadCountElement.textContent = 'Error';
-        statusMessageElement.innerHTML = '<span class="error-message">Failed to fetch data. Retrying soon...</span>';
+        console.error(err);
+        downloadCountElement.textContent = "Error";
+        statusMessageElement.innerHTML =
+          '<span class="error-message">Failed to fetch data.</span>';
         lastUpdatedElement.textContent = `Last attempt: ${new Date().toLocaleTimeString()}`;
-        
-        if (err.name === 'AbortError') {
-          showMessage('The request to GitHub timed out. Please check your internet connection and try again.');
-        }
-      } finally {
-        updateProgress(100);
-        // Reset progress bar after a delay
-        setTimeout(() => updateProgress(0), 1000);
       }
     }
 
-    // Initialization
-    document.addEventListener('DOMContentLoaded', () => {
-      // Initialize UI
+    document.addEventListener("DOMContentLoaded", () => {
       updateDownloadButtonsAndInfo();
-      
-      // Fetch counts after a short delay to allow UI to update
-      setTimeout(() => {
-        fetchDownloadCounts();
-        
-        // Set up periodic refresh
-        setInterval(fetchDownloadCounts, UPDATE_INTERVAL_MS);
-      }, 500);
+      fetchDownloadCounts();
+      setInterval(fetchDownloadCounts, UPDATE_INTERVAL_MS);
     });
   </script>
 </body>
